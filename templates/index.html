@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<title>Начало страницы</title>
+</head>
+<body>
+
+	<nav class="menu" id="menuSite">
+		<div class="nav__menu">
+			<ul>
+				<li><img id="avatarTg" alt=""></li>
+				<li><p id="nameTg">None</p></li>
+				<li><p id="dataTg">None</p></li>
+			</ul>
+		</div>
+	</nav>
+
+	<span class="grey_line" id="content__line"></span>
+
+	<div class="content__news" id="content_news">
+		{% if item == [] %}
+			<h2>Постиков нит((</h2>
+		{% else %}
+			{% for post in item %}
+				<div class="news">
+					<a href="posts/{{post[0]}}" class="news__a">
+						<div class="id__content">
+							<p id="post__id">{{post[0]}}</p>
+							<h2>{{post[1]}}</h2>
+						</div>
+						<span class="grey_line"></span>
+						<p class="desc__news">{{post[2]}}</p>
+					</a>
+				</div>
+			{% endfor %}
+		{% endif %}
+	</div>
+	
+	<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+	<script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+
+</body>
+</html>
