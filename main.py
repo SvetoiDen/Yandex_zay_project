@@ -3,16 +3,18 @@ from aiogram import Dispatcher, Bot
 from cogs import start, profile
 from data.db_data.db_session import global_init
 from server import app
+import logging
 import asyncio
 
 async def mainTelegram():
     bot = Bot(token='8117981299:AAGeYTB606RNqOctq31g3GIWux9qQ4zbQjw')
     di = Dispatcher()
+    logging.basicConfig(level=logging.INFO)
 
     global_init('data/db_data/db/dbTg.db')
 
     di.include_routers(start.start, profile.profile)
-    print('bot on')
+    logging.info("Бот запустился.")
     await di.start_polling(bot, skip_updates=True)
 
 async def mainServer():
@@ -24,4 +26,4 @@ if __name__ == '__main__':
         asyncio.run(mainTelegram())
     except:
         print(traceback.format_exc())
-        print('Bot off')
+        logging.warning("Бот был выключен")

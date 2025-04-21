@@ -7,6 +7,7 @@ from data.db_data.models.posts import Posts
 from data.func.buttons.buttonTg import mainButShow, butWeb
 from data.func.functions import codeCreate
 from data.config.texts import TEXT_START, TEXT_HTML, TEXT_HTML_2
+import logging
 import json
 
 start = Router()
@@ -15,13 +16,27 @@ start = Router()
 @start.message(CommandStart())
 async def startCommand(message: Message):
     db = create_session()
-    user = User()
-    user.id = message.from_user.id
-    user.name = message.from_user.username
-    db.add(user)
-    db.commit()
-    db.close()
-    await message.answer(text=TEXT_START, reply_markup=mainButShow)
+    try:
+        existing_user = db.query(User).filter(
+            User.id == message.from_user.id).first()
+
+        if not existing_user:
+            user = User(
+                id=message.from_user.id,
+                name=message.from_user.username or str(message.from_user.id),
+            )
+            db.add(user)
+            db.commit()
+            await message.answer(text=TEXT_START, reply_markup=mainButShow)
+        else:
+            await message.answer(text="👋 С возвращением!", reply_markup=mainButShow)
+
+    except Exception as e:
+        db.rollback()
+        logging.error(f"Start command error: {e}")
+        await message.answer(text="⚠️ Произошла ошибка при обработке команды")
+    finally:
+        db.close()
 
 @start.callback_query(F.data == 'create_web')
 async def createPost(callback: CallbackQuery):
