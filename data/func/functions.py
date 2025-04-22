@@ -5,6 +5,9 @@ import traceback
 from aiogram.types import User, UserProfilePhotos
 from aiogram import Bot
 from aiogram.methods import GetUserProfilePhotos
+from data.db_data.db_session import create_session
+from data.db_data.models.users import User
+from data.db_data.models.posts import Posts
 import requests
 import io
 from PIL import Image, ImageDraw, ImageFont
@@ -27,6 +30,34 @@ async def getPhoto(user: User):
         return file_url
     else:
         return None
+
+
+async def getUserPostsCount(user: User):
+    db = create_session()
+    count = db.query(Posts).filter(Posts.userId == user.id).count()
+    db.close()
+
+    return count
+
+
+async def getPostsRating(user: User):
+    db = create_session()
+    posts = db.query(Posts).filter(Posts.userId == user.id).all()
+    db.close()
+
+    rating = 0
+    for post in posts:
+        rating += post.rating
+
+    return rating
+
+
+async def getPost(post_id: str):
+    db = create_session()
+    post = db.query(Posts).filter(Posts.id == post_id).first()
+    db.close()
+
+    return post
 
 
 async def getUserCard(user: User):
