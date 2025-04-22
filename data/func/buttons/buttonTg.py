@@ -4,6 +4,7 @@ from aiogram.types import (
 )
 from data.db_data.db_session import create_session
 from data.db_data.models.posts import Posts
+from sqlalchemy import func
 
 mainBut = [
     [InlineKeyboardButton(text='Открыть веб сайт',
@@ -15,12 +16,24 @@ mainBut = [
 butWeb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Открыть веб сайт', web_app=WebAppInfo(
     url='https://127.0.0.1:5500/form_create'))]], resize_keyboard=True)
 mainButShow = InlineKeyboardMarkup(inline_keyboard=mainBut)
+postBut = [
+    [InlineKeyboardButton(text="❌ Закрыть", callback_data="profile")],
+]
+postButShow = InlineKeyboardMarkup(inline_keyboard=postBut)
 
 
-async def getUserPostsButtons(user_id: int) -> InlineKeyboardMarkup:
+POSTS_PER_PAGE = 5 
+
+
+async def getUserPostsButtons(user_id: int, page: int = 1) -> InlineKeyboardMarkup:
 
     db = create_session()
-    posts = db.query(Posts).filter(Posts.userId == user_id).all()
+    offset = (page - 1) * POSTS_PER_PAGE
+
+    posts = db.query(Posts).filter(Posts.userId == user_id).order_by(
+        Posts.id).offset(offset).limit(POSTS_PER_PAGE).all()
+    total_posts = db.query(func.count(Posts.id)).filter(
+        Posts.userId == user_id).scalar()
     db.close()
 
     buttons = []
@@ -30,6 +43,20 @@ async def getUserPostsButtons(user_id: int) -> InlineKeyboardMarkup:
 
     if not buttons:
         buttons.append([InlineKeyboardButton(
-            text="У вас пока нет постов", callback_data="no_posts")])
+            text="У вас пока нет постов", callback_data="no_posts")]) # не обрабатывается
+
+    pagination_buttons = []
+    if total_posts > POSTS_PER_PAGE:
+        if page > 1:
+            pagination_buttons.append(InlineKeyboardButton(
+                text="⬅️ Предыдущая", callback_data=f"profile_page_{user_id}_{page - 1}"))
+        if offset + POSTS_PER_PAGE < total_posts:
+            pagination_buttons.append(InlineKeyboardButton(
+                text="Следующая ➡️", callback_data=f"profile_page_{user_id}_{page + 1}"))
+
+    if pagination_buttons:
+        buttons.append(pagination_buttons)
+    
+    buttons.append([InlineKeyboardButton(text="🔙 В меню", callback_data="menu")])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)

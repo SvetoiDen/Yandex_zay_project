@@ -62,3 +62,8 @@ async def getDataPost(message: Message):
         F.write(TEXT_HTML + '       \n'.join(data['content']) + '\n' + TEXT_HTML_2)
 
     await message.answer(text=f"Ваш пост успешно создан!", reply_markup=ReplyKeyboardRemove())
+
+
+@start.callback_query(F.data == 'menu')
+async def return_to_menu(callback: CallbackQuery):
+    await callback.message.edit_reply_markup(reply_markup=mainButShow)
