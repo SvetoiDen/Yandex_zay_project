@@ -1,6 +1,6 @@
 import traceback
 from aiogram import Dispatcher, Bot
-from cogs import start, profile, openpost, findpost
+from cogs import start, profile, openpost, findpost, admin_panel
 from data.db_data.db_session import global_init
 from server import app
 import logging
@@ -13,7 +13,7 @@ async def mainTelegram():
 
     global_init('data/db_data/db/dbTg.db')
 
-    di.include_routers(start.start, profile.profile, openpost.post, findpost.finder)
+    di.include_routers(start.start, profile.profile, openpost.post, findpost.finder, admin_panel.admin)
     logging.info("Бот запустился.")
     await di.start_polling(bot, skip_updates=True)
 

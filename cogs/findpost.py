@@ -18,7 +18,7 @@ finder = Router()
 @finder.callback_query(F.data == "findPost")
 async def find_post_callback(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer("🔎 Введите текст для поиска постов:")
+    await callback.message.answer("🔎 Введите текст или ID поста для поиска:")
     await state.set_state(SearchStates.waiting_for_query)
     await callback.answer()
 
@@ -42,12 +42,14 @@ async def show_search_results(message_or_callback, state: FSMContext):
     db = create_session()
     posts = db.query(Posts).filter(
         (Posts.namePost.ilike(f'%{query}%')) |
-        (Posts.descPost.ilike(f'%{query}%'))
+        (Posts.descPost.ilike(f'%{query}%')) |
+        (Posts.id == query)
     ).order_by(desc(Posts.rating)).offset((page - 1) * POSTS_PER_PAGE).limit(POSTS_PER_PAGE).all()
 
     total = db.query(Posts).filter(
         (Posts.namePost.ilike(f'%{query}%')) |
-        (Posts.descPost.ilike(f'%{query}%'))
+        (Posts.descPost.ilike(f'%{query}%')) |
+        (Posts.id == query)
     ).count()
     db.close()
 
@@ -78,6 +80,8 @@ async def show_search_results(message_or_callback, state: FSMContext):
         "🔍 Найденные посты:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
     )
+
+    await state.clear()
 
 
 @finder.callback_query(F.data.startswith("search_page_"))

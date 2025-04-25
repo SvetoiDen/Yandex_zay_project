@@ -60,14 +60,54 @@ async def getPost(post_id: str):
     return post
 
 
+async def getPostAuthor(post_id: str):
+    db = create_session()
+    post = db.query(Posts).filter(Posts.id == post_id).first()
+    user = db.query(User).filter(User.id == post.userId).first()
+    db.close()
+
+    return user
+
+
 async def findPost(query: str):
     db = create_session()
     posts = db.query(Posts).filter(
         (Posts.namePost.ilike(f'%{query}%')) |
-        (Posts.descPost.ilike(f'%{query}%'))
+        (Posts.descPost.ilike(f'%{query}%')) |
+        (Posts.id == query)
     ).all()
     db.close()
     return posts
+
+
+async def deletePost(post_id: str):
+    db = create_session()
+    post = db.query(Posts).filter(Posts.id == post_id).first()
+    if post:
+        db.delete(post)
+        db.commit()
+        db.close()
+
+        return True
+    else:
+        return False
+
+
+async def updatePost(post_id: str, namePost=None, descPost=None, rating=None):
+    db = create_session()
+    post = db.query(Posts).filter(Posts.id == post_id).first()
+
+    if namePost is not None:
+        post.namePost = namePost
+
+    if descPost is not None:
+        post.descPost = descPost
+
+    if rating is not None:
+        post.rating = rating
+
+    db.commit()
+    db.close()
 
 
 async def getUserCard(user: User):
