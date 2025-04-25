@@ -60,6 +60,16 @@ async def getPost(post_id: str):
     return post
 
 
+async def findPost(query: str):
+    db = create_session()
+    posts = db.query(Posts).filter(
+        (Posts.namePost.ilike(f'%{query}%')) |
+        (Posts.descPost.ilike(f'%{query}%'))
+    ).all()
+    db.close()
+    return posts
+
+
 async def getUserCard(user: User):
 
     def prepare_mask(size, antialias=2):

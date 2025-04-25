@@ -29,7 +29,7 @@ async def startCommand(message: Message):
             db.commit()
             await message.answer(text=TEXT_START, reply_markup=mainButShow)
         else:
-            await message.answer(text="👋 С возвращением!", reply_markup=mainButShow)
+            await message.answer(text=TEXT_START, reply_markup=mainButShow)
 
     except Exception as e:
         db.rollback()
@@ -66,4 +66,5 @@ async def getDataPost(message: Message):
 
 @start.callback_query(F.data == 'menu')
 async def return_to_menu(callback: CallbackQuery):
-    await callback.message.edit_reply_markup(reply_markup=mainButShow)
+    await callback.message.delete()
+    await callback.message.answer(TEXT_START, reply_markup=mainButShow)

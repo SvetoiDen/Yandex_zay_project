@@ -4,7 +4,8 @@ from aiogram.types import (
 )
 from data.db_data.db_session import create_session
 from data.db_data.models.posts import Posts
-from sqlalchemy import func
+from sqlalchemy import func, desc
+
 
 mainBut = [
     [InlineKeyboardButton(text='Открыть веб сайт',
@@ -31,7 +32,8 @@ async def getUserPostsButtons(user_id: int, page: int = 1) -> InlineKeyboardMark
     offset = (page - 1) * POSTS_PER_PAGE
 
     posts = db.query(Posts).filter(Posts.userId == user_id).order_by(
-        Posts.id).offset(offset).limit(POSTS_PER_PAGE).all()
+    desc(Posts.rating)).offset(offset).limit(POSTS_PER_PAGE).all()
+
     total_posts = db.query(func.count(Posts.id)).filter(
         Posts.userId == user_id).scalar()
     db.close()

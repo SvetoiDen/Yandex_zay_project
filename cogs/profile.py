@@ -22,6 +22,7 @@ async def profileUser(callback: CallbackQuery):
             f"└ Посты: {posts_count}"
         )
 
+        await callback.message.delete()
         await callback.message.answer_photo(
             photo=photo,
             caption=caption,
