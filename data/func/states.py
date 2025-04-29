@@ -13,3 +13,7 @@ class EditPostStates(StatesGroup):
     waiting_for_title = State()
     waiting_for_description = State()
     waiting_for_rating = State()
+
+
+class CommentStates(StatesGroup):
+    waiting_for_comment = State()

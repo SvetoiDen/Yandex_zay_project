@@ -13,3 +13,5 @@ class Posts(SqlAlchemyBase):
     descPost = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     rating = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     user = orm.relationship('User')
+    comments = orm.relationship(
+        "Comment", back_populates="post", cascade="all, delete-orphan")

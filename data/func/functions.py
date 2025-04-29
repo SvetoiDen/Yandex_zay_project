@@ -1,3 +1,4 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 import string
 import random
 import asyncio
@@ -8,6 +9,8 @@ from aiogram.methods import GetUserProfilePhotos
 from data.db_data.db_session import create_session
 from data.db_data.models.users import User
 from data.db_data.models.posts import Posts
+from data.db_data.models.admins import Admin
+from sqlalchemy.orm import Session
 import requests
 import io
 from PIL import Image, ImageDraw, ImageFont
@@ -108,6 +111,17 @@ async def updatePost(post_id: str, namePost=None, descPost=None, rating=None):
 
     db.commit()
     db.close()
+
+
+def get_admin_level(session: Session, user_id: int) -> int:
+    admin = session.query(Admin).filter(Admin.user_id == user_id).first()
+    return admin.level if admin else 0
+
+
+def require_level(session: Session, user_id: int, required: int) -> bool:
+    level = get_admin_level(session, user_id)
+    return level >= required
+
 
 
 async def getUserCard(user: User):

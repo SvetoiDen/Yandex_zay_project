@@ -1,3 +1,4 @@
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram import Router, F
 import logging
 from data.func.functions import getPost
@@ -21,16 +22,23 @@ async def open_post_callback(callback: CallbackQuery):
             db = create_session()
             user = db.query(User).filter(User.id == post.userId).first()
             db.close()
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(
+                    text="💬 Комментарии", callback_data=f"comments_{post.id}")],
+                [InlineKeyboardButton(
+                    text="🔙 Назад", callback_data="menu")]
+            ])
+
             await callback.message.answer(
                 f"<b>{post.namePost}</b>\n"
                 f"<i>Описание:</i> {post.descPost}\n"
                 f"<i>Рейтинг:</i> ⭐ {post.rating}\n"
                 f"<i>Автор:</i> 👤 @{user.name}",
-                reply_markup=postButShow,
+                reply_markup=keyboard,
                 parse_mode="HTML"
             )
 
-        
             await callback.answer()
         else:
             await callback.answer("Пост не найден.")

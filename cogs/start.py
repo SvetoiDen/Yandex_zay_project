@@ -4,6 +4,7 @@ from aiogram.filters.command import Command, CommandStart
 from data.db_data.db_session import create_session
 from data.db_data.models.users import User
 from data.db_data.models.posts import Posts
+from data.db_data.models.admins import Admin
 from data.func.buttons.buttonTg import mainButShow, butWeb
 from data.func.functions import codeCreate
 from data.config.texts import TEXT_START, TEXT_HTML, TEXT_HTML_2
@@ -11,6 +12,7 @@ import logging
 import json
 
 start = Router()
+DEFAULT_ADMIN_ID = [1012085977, 1099501680]
 
 
 @start.message(CommandStart())
@@ -28,8 +30,17 @@ async def startCommand(message: Message):
             db.add(user)
             db.commit()
             await message.answer(text=TEXT_START, reply_markup=mainButShow)
-        else:
-            await message.answer(text=TEXT_START, reply_markup=mainButShow)
+        
+        for admin_id in DEFAULT_ADMIN_ID:
+            existing_admin = db.query(Admin).filter(
+                Admin.user_id == admin_id).first()
+            if not existing_admin:
+                new_admin = Admin(user_id=admin_id, level=3)
+                db.add(new_admin)
+
+        db.commit()
+        await message.answer(text=TEXT_START, reply_markup=mainButShow)
+
 
     except Exception as e:
         db.rollback()

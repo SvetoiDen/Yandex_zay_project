@@ -1,3 +1,5 @@
+from data.db_data.models.admins import Admin
+from data.func.functions import require_level
 from aiogram import Router, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from aiogram.filters.command import Command
@@ -29,16 +31,22 @@ async def admin_panel(message: Message):
         return
 
     await message.answer("🔧 Панель администратора:\n"
-                         "/admin - открыть админ панель,\n"
-                         "/stats - статистика,\n"
-                         "/users - список пользователей,\n"
-                         "/edit_post - редактировать пост по ID.", reply_markup=postButShow)
+                         "/admin - открыть админ панель (1+),\n"
+                         "/stats - статистика (1+),\n"
+                         "/users - список пользователей (1+),\n"
+                         "/edit_post - редактировать пост по ID (2+),\n"
+                         "/set_admin - назначить администратора (3+),\n"
+                         "/delete_admin - удалить администратора (3+).", reply_markup=postButShow)
 
 
 @admin.message(Command("stats"))
 async def admin_stats(message: Message):
-    if not await check_admin(message):
-        return
+    session = create_session()
+
+    admin = session.query(Admin).filter(
+        Admin.user_id == message.from_user.id).first()
+    if not admin or admin.level < 1:
+        return await message.reply("❌ Недостаточно прав.")
 
     db = create_session()
     total_users = db.query(User).count()
@@ -50,8 +58,13 @@ async def admin_stats(message: Message):
 
 @admin.message(Command("users"))
 async def admin_users(message: Message):
-    if not await check_admin(message):
-        return
+    session = create_session()
+
+
+    admin = session.query(Admin).filter(
+        Admin.user_id == message.from_user.id).first()
+    if not admin or admin.level < 1:
+        return await message.reply("❌ Недостаточно прав.")
 
     db = create_session()
     users = db.query(User).all()
@@ -66,8 +79,13 @@ async def admin_users(message: Message):
 
 @admin.message(Command("edit_post"))
 async def admin_edit_post(message: Message, state: FSMContext):
-    if not await check_admin(message):
-        return
+    session = create_session()
+
+    admin = session.query(Admin).filter(
+        Admin.user_id == message.from_user.id).first()
+    if not admin or admin.level < 2:
+        return await message.reply("❌ Недостаточно прав.")
+    
     await message.answer("📝 Введите ID поста для редактирования:")
     await state.set_state(AdminStates.waiting_for_post_id)
 
@@ -280,3 +298,68 @@ async def handle_admin_cancel(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("❌ Действие отменено.")
     await state.clear()
     await callback.answer()
+
+
+@admin.message(F.text.startswith("/set_admin"))
+async def set_admin(message: Message):
+    session = create_session()
+
+    try:
+        admin = session.query(Admin).filter(
+            Admin.user_id == message.from_user.id).first()
+        if not admin or admin.level < 3:
+            return await message.reply("❌ Недостаточно прав.")
+
+        try:
+            _, uid_str, level_str = message.text.split()
+            uid = int(uid_str)
+            level = int(level_str)
+        except:
+            return await message.reply("⚠️ Использование: /set_admin <user_id> <уровень (1-3)>")
+
+        target = session.query(Admin).filter(Admin.user_id == uid).first()
+        if target:
+            target.level = level
+        else:
+            new_admin = Admin(user_id=uid, level=level)
+            session.add(new_admin)
+
+        session.commit()
+        await message.reply(f"✅ Назначен уровень {level} для пользователя {uid}")
+
+    except Exception as e:
+        session.rollback()
+        await message.reply("⚠️ Ошибка при назначении прав.")
+    finally:
+        session.close()
+
+
+@admin.message(F.text.startswith("/delete_admin"))
+async def delete_admin(message: Message):
+    session = create_session()
+
+    try:
+        admin = session.query(Admin).filter(
+            Admin.user_id == message.from_user.id).first()
+        if not admin or admin.level < 3:
+            return await message.reply("❌ Недостаточно прав.")
+
+        try:
+            _, uid_str = message.text.split()
+            uid = int(uid_str)
+        except:
+            return await message.reply("⚠️ Использование: /delete_admin <user_id>")
+
+        target = session.query(Admin).filter(Admin.user_id == uid).first()
+        if not target:
+            return await message.reply("⚠️ Администратор с таким ID не найден.")
+
+        session.delete(target)
+        session.commit()
+        await message.reply(f"✅ Администратор {uid} был удален")
+
+    except Exception as e:
+        session.rollback()
+        await message.reply("⚠️ Ошибка при снятии прав.")
+    finally:
+        session.close()
