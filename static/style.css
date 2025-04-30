@@ -23,7 +23,7 @@ var(--tg-theme-button-text-color); */
 
 input,textarea {
 	font-family: "Montserrat Regular";
-	color: #fff;
+	color: var(--tg-theme-text-color);
 }
 
 .H2 {
@@ -75,8 +75,8 @@ h1,h2,h3 {
 }
 
 #butCreate, #but__news {
-	background-color: #fff;
-	color: black;
+	background-color: var(--tg-theme-button-color);
+	color: var(--tg-theme-button-text-color);
 	font-family: "Montserrat Bold";
 	padding: 10px 16px 10px 16px;
 	border-radius: 15px;
@@ -91,7 +91,7 @@ h1,h2,h3 {
 	width: 64px;
 	height: 64px;
 	border-radius: 50%;
-	border: #fff solid 1px;
+	border: var(--tg-theme-button-color) solid 1px;
 }
 
 .content__news {
@@ -114,7 +114,7 @@ h1,h2,h3 {
 .news {
 	margin: 16px 20px 16px 20px;
 	padding: 10px 15px 10px 15px;
-	border: 4px solid #fff;
+	border: 4px solid var(--tg-theme-button-color);
 }
 
 .news__a {
@@ -158,7 +158,7 @@ h1,h2,h3 {
 .content__structure {
 	display: block;
 	max-width: 740px;
-	border: 1px solid #fff;
+	border: 1px solid var(--tg-theme-button-color);
 	margin-bottom: 15px;
 }
 
@@ -168,32 +168,32 @@ input {
 	border: none;
 	outline: none;
 	font-size: 18px;
-	border: 1px solid #fff;
+	border: 1px solid var(--tg-theme-button-color);
 }
 
 #description {
 	height: 60px;
-	border: 1px solid #fff;
+	border: 1px solid var(--tg-theme-button-color);
 }
 .textArea {
 	width: 100%;
 	background: transparent;
 	box-sizing: border-box;
-	color: #fff;
+	color: var(--tg-theme-button-color);
 }
 
 .textArea::placeholder {
-	color: #fff;
+	color: var(--tg-theme-text-color);
 }
 
 #button__post {
 	border: none;
-	background: #fff;
+	background: var(--tg-theme-button-color);
 	text-align: center;
 	align-items: center;
 	padding: 16px 4px 16px 4px;
 	border-radius: 15px;
-	color: #000;
+	color: var(--tg-theme-text-color);
 	user-select: none;
 	cursor: pointer;
 	font-family: "Montserrat Bold";
@@ -213,14 +213,14 @@ input {
 }
 
 .menu__post h2 {
-    color: #fff;
+    color: var(--tg-theme-text-color);
     font-family: 'Montserrat Bold';
 }
 
 .post__text {
     max-width: 760px;
     margin: 0 auto;
-    color: #fff;
+    color: var(--tg-theme-text-color);
 }
 
 .post__text h2 {

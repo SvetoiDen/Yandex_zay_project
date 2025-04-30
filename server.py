@@ -37,4 +37,4 @@ def openPostId(id_post):
 if __name__ == '__main__':
     db_session.global_init('data/db_data/db/dbTg.db')
     context = ('cert.pem', 'key.pem')
-    app.run(debug=True, ssl_context=context)
+    app.run(debug=True, ssl_context=context, port='5000')

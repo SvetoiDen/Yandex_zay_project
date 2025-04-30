@@ -18,9 +18,6 @@ async def mainTelegram():
     logging.info("Бот запустился.")
     await di.start_polling(bot, skip_updates=True)
 
-async def mainServer():
-    context = ('server/cert.pem', 'server/key.pem')
-    app.run(host='127.0.0.1', port=5500, ssl_context=context)
 
 if __name__ == '__main__':
     try:
