@@ -1,0 +1,4 @@
+aiogram
+SQLAlchemy
+requests
+Flask
