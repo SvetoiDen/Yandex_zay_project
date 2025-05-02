@@ -60,7 +60,7 @@ async def getPostsRating(user: User):
 
 async def getPost(post_id: str):
     db = create_session()
-    post = db.query(Posts).filter(Posts.id == post_id).first()
+    post = db.query(Posts).filter((Posts.id == post_id) | (Posts.id.ilike(f'%{post_id}%'))).first()
     db.close()
 
     return post
@@ -68,7 +68,7 @@ async def getPost(post_id: str):
 
 async def getPostAuthor(post_id: str):
     db = create_session()
-    post = db.query(Posts).filter(Posts.id == post_id).first()
+    post = db.query(Posts).filter((Posts.id == post_id) | (Posts.id.ilike(f'%{post_id}%'))).first()
     user = db.query(User).filter(User.id == post.userId).first()
     db.close()
 

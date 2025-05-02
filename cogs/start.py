@@ -32,7 +32,7 @@ async def startCommand(message: Message):
             db.add(user)
             db.commit()
             await message.answer(text=TEXT_START, reply_markup=mainButShow)
-        
+
         for admin_id in DEFAULT_ADMIN_ID:
             existing_admin = db.query(Admin).filter(
                 Admin.user_id == admin_id).first()
@@ -51,10 +51,12 @@ async def startCommand(message: Message):
     finally:
         db.close()
 
+
 @start.callback_query(F.data == 'create_web')
 async def createPost(callback: CallbackQuery):
     await callback.answer()
     await callback.message.answer('Нажмите на клавиатуру для создания ссылки', reply_markup=butWeb)
+
 
 @start.message(F.content_type == ContentType.WEB_APP_DATA)
 async def getDataPost(message: Message):
@@ -76,11 +78,11 @@ async def getDataPost(message: Message):
     for elem in dataContent:
         if elem.startswith('img'):
             typeImg = elem.split('_')[-1]
-            newTypeImg = "data:"+ typeImg +";base64,"
-            image = db.query(ImagePosts).filter(Posts.id == data['id']).filter(ImagePosts.pos == i).first()
+            newTypeImg = "data:" + typeImg + ";base64,"
+            image = db.query(ImagePosts).filter(ImagePosts.post_id == data['id'], ImagePosts.pos == i).first()
             newTypeImg = "data:" + typeImg + f";base64,{str(image.image)[2:-1]}"
             newContent.append(f"<img src='{newTypeImg}' />")
-            i=i+1
+            i = i + 1
         else:
             newContent.append(elem)
     db.close()
@@ -95,3 +97,9 @@ async def getDataPost(message: Message):
 async def return_to_menu(callback: CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(TEXT_START, reply_markup=mainButShow)
+
+
+@start.message(F.text == '❌ Отмена')
+async def close_create_post(message: Message):
+    await message.delete()
+    await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id - 1)

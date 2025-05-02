@@ -100,7 +100,7 @@ async def admin_handle_post_id(message: Message, state: FSMContext):
         await state.clear()
         return
 
-    await state.update_data(post_id=post_id)
+    await state.update_data(post_id=db_post.id)
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text="🗑 Удалить", callback_data="admin_delete_post")],

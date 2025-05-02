@@ -15,7 +15,7 @@ mainBut = [
         text='Найти пост', callback_data='findPost')]
 ]
 butWeb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Открыть веб сайт', web_app=WebAppInfo(
-    url='https://127.0.0.1:5000/form_create'))]], resize_keyboard=True)
+    url='https://127.0.0.1:5000/form_create'))],[KeyboardButton(text='❌ Отмена')]], resize_keyboard=True)
 mainButShow = InlineKeyboardMarkup(inline_keyboard=mainBut)
 postBut = [
     [InlineKeyboardButton(text="❌ Закрыть", callback_data="profile")],
