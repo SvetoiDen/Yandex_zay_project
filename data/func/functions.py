@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy.ext.asyncio import AsyncSession
 import string
 import random
@@ -8,6 +10,7 @@ from aiogram import Bot
 from aiogram.methods import GetUserProfilePhotos
 from data.db_data.db_session import create_session
 from data.db_data.models.users import User
+from data.db_data.models.images import ImagePosts
 from data.db_data.models.posts import Posts
 from data.db_data.models.admins import Admin
 from sqlalchemy.orm import Session
@@ -86,10 +89,17 @@ async def findPost(query: str):
 async def deletePost(post_id: str):
     db = create_session()
     post = db.query(Posts).filter(Posts.id == post_id).first()
-    if post:
+    images = db.query(ImagePosts).filter(ImagePosts.post_id == post_id).all()
+    if post and images:
         db.delete(post)
         db.commit()
+
+        for elem in images:
+            db.delete(elem)
+        db.commit()
         db.close()
+
+        os.remove(f'templates/posts/{post_id}.html')
 
         return True
     else:

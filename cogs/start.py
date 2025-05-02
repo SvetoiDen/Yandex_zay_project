@@ -1,3 +1,4 @@
+import base64
 from aiogram import Router, Bot, F
 from aiogram.types import Message, WebAppData, ContentType, ReplyKeyboardRemove, CallbackQuery
 from aiogram.filters.command import Command, CommandStart
@@ -5,6 +6,7 @@ from data.db_data.db_session import create_session
 from data.db_data.models.users import User
 from data.db_data.models.posts import Posts
 from data.db_data.models.admins import Admin
+from data.db_data.models.images import ImagePosts
 from data.func.buttons.buttonTg import mainButShow, butWeb
 from data.func.functions import codeCreate
 from data.config.texts import TEXT_START, TEXT_HTML, TEXT_HTML_2
@@ -57,20 +59,34 @@ async def createPost(callback: CallbackQuery):
 @start.message(F.content_type == ContentType.WEB_APP_DATA)
 async def getDataPost(message: Message):
     data = json.loads(message.web_app_data.data)
+    dataContent = data['content']
+    print(dataContent)
 
-    idPost = codeCreate()
     db = create_session()
     post = Posts()
-    post.id = idPost
+    post.id = data['id']
     post.userId = message.from_user.id
     post.namePost = data['name']
     post.descPost = data['desc']
     db.add(post)
     db.commit()
+
+    newContent = []
+    i = 0
+    for elem in dataContent:
+        if elem.startswith('img'):
+            typeImg = elem.split('_')[-1]
+            newTypeImg = "data:"+ typeImg +";base64,"
+            image = db.query(ImagePosts).filter(Posts.id == data['id']).filter(ImagePosts.pos == i).first()
+            newTypeImg = "data:" + typeImg + f";base64,{str(image.image)[2:-1]}"
+            newContent.append(f"<img src='{newTypeImg}' />")
+            i=i+1
+        else:
+            newContent.append(elem)
     db.close()
 
-    with open(f'templates/posts/{idPost}.html', 'w', encoding='utf-8') as F:
-        F.write(TEXT_HTML + '       \n'.join(data['content']) + '\n' + TEXT_HTML_2)
+    with open(f'templates/posts/{data['id']}.html', 'w', encoding='utf-8') as F:
+        F.write(TEXT_HTML + '\n'.join(newContent) + '\n' + TEXT_HTML_2)
 
     await message.answer(text=f"Ваш пост успешно создан!", reply_markup=ReplyKeyboardRemove())
 

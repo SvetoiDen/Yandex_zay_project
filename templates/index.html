@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+	<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 	<title>Начало страницы</title>
 </head>
@@ -23,7 +24,7 @@
 
 	<div class="content__news" id="content_news">
 		{% if item == [] %}
-			<h2>Постиков нит((</h2>
+			<h2 class="error__post">Постиков нит((</h2>
 		{% else %}
 			{% for post in item %}
 				<div class="news">
@@ -40,7 +41,6 @@
 		{% endif %}
 	</div>
 	
-	<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 	<script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 
 </body>

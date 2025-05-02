@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<script src="https://telegram.org/js/telegram-web-app.js?57"></script>
 	<title>Создать пост</title>
 </head>
 <body>
@@ -19,6 +20,7 @@
 			<div class="content__text__post">
 				<p class="create__textarea" onclick="createText()" style="user-select: none"><i class='bx bx-plus'></i>Добавить текст</p>
 				<p class="create__h" onclick="createH2()" style="user-select: none"><i class='bx bx-up-arrow-alt'></i>Добавить заголовок</p>
+				<p class="create__img" onclick="createImg()" style="user-select: none"><i class='bx bx-image-add' ></i>Добавить картинку</p>
 				<div class="edit__create">
 					<p class="delete__create" onclick="deleteCreate()" style="user-select: none"><i class='bx bx-minus'></i>Удалить созданный контент</p>
 				</div>
@@ -30,7 +32,6 @@
 		</form>
 	</div>
 
-	<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 	<script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 	<script src="{{ url_for('static', filename='scripts/createPost.js') }}"></script>
 
