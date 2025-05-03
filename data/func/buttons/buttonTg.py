@@ -9,13 +9,13 @@ from sqlalchemy import func, desc
 
 mainBut = [
     [InlineKeyboardButton(text='Открыть веб сайт',
-                          web_app=WebAppInfo(url='https://127.0.0.1:5000/'))],
+                          web_app=WebAppInfo(url='https://light-cat-5.telebit.io/'))],
     [InlineKeyboardButton(text='Создать пост', callback_data='create_web')],
     [InlineKeyboardButton(text='Профиль', callback_data='profile'), InlineKeyboardButton(
         text='Найти пост', callback_data='findPost')]
 ]
 butWeb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Открыть веб сайт', web_app=WebAppInfo(
-    url='https://127.0.0.1:5000/form_create'))],[KeyboardButton(text='❌ Отмена')]], resize_keyboard=True)
+    url='https://light-cat-5.telebit.io/form_create'))],[KeyboardButton(text='❌ Отмена')]], resize_keyboard=True)
 mainButShow = InlineKeyboardMarkup(inline_keyboard=mainBut)
 postBut = [
     [InlineKeyboardButton(text="❌ Закрыть", callback_data="profile")],

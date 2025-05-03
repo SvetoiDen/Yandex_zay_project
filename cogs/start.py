@@ -64,9 +64,11 @@ async def getDataPost(message: Message):
     dataContent = data['content']
     print(dataContent)
 
+    idPost = data['id']
+
     db = create_session()
     post = Posts()
-    post.id = data['id']
+    post.id = idPost
     post.userId = message.from_user.id
     post.namePost = data['name']
     post.descPost = data['desc']
@@ -79,7 +81,7 @@ async def getDataPost(message: Message):
         if elem.startswith('img'):
             typeImg = elem.split('_')[-1]
             newTypeImg = "data:" + typeImg + ";base64,"
-            image = db.query(ImagePosts).filter(ImagePosts.post_id == data['id'], ImagePosts.pos == i).first()
+            image = db.query(ImagePosts).filter(ImagePosts.post_id == idPost, ImagePosts.pos == i).first()
             newTypeImg = "data:" + typeImg + f";base64,{str(image.image)[2:-1]}"
             newContent.append(f"<img src='{newTypeImg}' />")
             i = i + 1
@@ -87,7 +89,7 @@ async def getDataPost(message: Message):
             newContent.append(elem)
     db.close()
 
-    with open(f'templates/posts/{data['id']}.html', 'w', encoding='utf-8') as F:
+    with open(f'templates/posts/{idPost}.html', 'w', encoding='utf-8') as F:
         F.write(TEXT_HTML + '\n'.join(newContent) + '\n' + TEXT_HTML_2)
 
     await message.answer(text=f"Ваш пост успешно создан!", reply_markup=ReplyKeyboardRemove())
