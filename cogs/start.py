@@ -1,6 +1,6 @@
 import base64
 from aiogram import Router, Bot, F
-from aiogram.types import Message, WebAppData, ContentType, ReplyKeyboardRemove, CallbackQuery
+from aiogram.types import Message, WebAppData, ContentType, ReplyKeyboardRemove, CallbackQuery, FSInputFile
 from aiogram.filters.command import Command, CommandStart
 from data.db_data.db_session import create_session
 from data.db_data.models.users import User
@@ -31,7 +31,7 @@ async def startCommand(message: Message):
             )
             db.add(user)
             db.commit()
-            await message.answer(text=TEXT_START, reply_markup=mainButShow)
+            await message.answer_photo(photo=FSInputFile('data/config/image/Avatar_Main.png'), caption=TEXT_START, reply_markup=mainButShow)
 
         for admin_id in DEFAULT_ADMIN_ID:
             existing_admin = db.query(Admin).filter(
@@ -41,7 +41,7 @@ async def startCommand(message: Message):
                 db.add(new_admin)
 
         db.commit()
-        await message.answer(text=TEXT_START, reply_markup=mainButShow)
+        await message.answer_photo(photo=FSInputFile('data/config/image/Avatar_Main.png'), caption=TEXT_START, reply_markup=mainButShow)
 
 
     except Exception as e:
@@ -98,7 +98,7 @@ async def getDataPost(message: Message):
 @start.callback_query(F.data == 'menu')
 async def return_to_menu(callback: CallbackQuery):
     await callback.message.delete()
-    await callback.message.answer(TEXT_START, reply_markup=mainButShow)
+    await callback.message.answer_photo(photo=FSInputFile('data/config/image/Avatar_Main.png'), caption=TEXT_START, reply_markup=mainButShow)
 
 
 @start.message(F.text == '❌ Отмена')

@@ -90,12 +90,13 @@ async def deletePost(post_id: str):
     db = create_session()
     post = db.query(Posts).filter(Posts.id == post_id).first()
     images = db.query(ImagePosts).filter(ImagePosts.post_id == post_id).all()
-    if post and images:
+    if post:
         db.delete(post)
         db.commit()
 
-        for elem in images:
-            db.delete(elem)
+        if images:
+            for elem in images:
+                db.delete(elem)
         db.commit()
         db.close()
 
