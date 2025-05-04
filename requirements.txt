@@ -2,3 +2,5 @@ aiogram
 SQLAlchemy
 requests
 Flask
+pandas
+openpyxl

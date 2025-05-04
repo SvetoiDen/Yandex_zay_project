@@ -9,6 +9,5 @@ class User(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, nullable=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    postCnt = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     dataStart = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
     news = orm.relationship("Posts", back_populates='user')

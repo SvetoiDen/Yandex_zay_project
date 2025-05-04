@@ -1,5 +1,6 @@
+import datetime
+import logging
 import os
-
 from sqlalchemy.ext.asyncio import AsyncSession
 import string
 import random
@@ -13,6 +14,7 @@ from data.db_data.models.users import User
 from data.db_data.models.images import ImagePosts
 from data.db_data.models.posts import Posts
 from data.db_data.models.admins import Admin
+from data.db_data.models.comments import Comment
 from sqlalchemy.orm import Session
 import requests
 import io
@@ -24,6 +26,7 @@ def codeCreate():
     for _ in range(6):
         code += random.choice(string.ascii_uppercase + string.digits)
     return code
+
 
 async def getPhoto(user: User):
     bot = Bot(token='8117981299:AAGeYTB606RNqOctq31g3GIWux9qQ4zbQjw')
@@ -134,9 +137,7 @@ def require_level(session: Session, user_id: int, required: int) -> bool:
     return level >= required
 
 
-
 async def getUserCard(user: User):
-
     def prepare_mask(size, antialias=2):
         mask = Image.new('L', (size[0] * antialias, size[1] * antialias), 0)
         ImageDraw.Draw(mask).ellipse((0, 0) + mask.size, fill=255)
@@ -175,3 +176,67 @@ async def getUserCard(user: User):
     idraw.text((198, 78), f'{user.first_name}', font=h)
     idraw.text((260, 138), f'{user.id}', font=a)
     image.save('data/config/image/card.png')
+
+
+async def create_report_format(format: str):
+    try:
+        db = create_session()
+        posts = db.query(Posts).all()
+        users = db.query(User).all()
+        comments = db.query(Comment).all()
+
+        if format == 'csv':
+            import csv
+            with open(f'data/config/report_file.{format}', 'w') as F:
+                writerData = csv.writer(F, delimiter=';', dialect='excel')
+                writerData.writerow(['Users'])
+                writerData.writerow(['ID', "Name", "DataStart"])
+                for row in users:
+                    writerData.writerow([row.id, row.name, row.dataStart.strftime("%d-%m-%Y %H:%M:%S")])
+                writerData.writerow([''])
+                writerData.writerow(['Posts'])
+                writerData.writerow(['ID', "Name", "DataStart"])
+                for row in posts:
+                    writerData.writerow([row.id, db.query(User).filter(User.id == row.userId).first().name, row.namePost, row.descPost, row.rating])
+                writerData.writerow([''])
+                writerData.writerow(['Comments'])
+                writerData.writerow(['ID', "Post", "User", "Comment"])
+                for row in comments:
+                    writerData.writerow([row.id,
+                                         db.query(Posts).filter(Posts.id == row.post_id).first().name,
+                                         db.query(User).filter(User.id == row.user_id).first().name,
+                                         row.text])
+        else:
+            import pandas as pd
+            userList = (
+                [id.id for id in users],
+                [name.name for name in users],
+                [data.dataStart.strftime("%d-%m-%Y %H:%M:%S") for data in users]
+            )
+            postsList = (
+                [id.id for id in posts],
+                [db.query(User).filter(User.id == row.userId).first().name for row in posts],
+                [post.namePost for post in posts],
+                [post.descPost for post in posts],
+                [row.rating for row in posts]
+            )
+            commentsList = (
+                [id.id for id in comments],
+                [db.query(Posts).filter(Posts.id == row.post_id).first().name for row in comments],
+                [db.query(User).filter(User.id == row.user_id).first().name for row in comments],
+                [text.text for text in comments]
+            )
+
+            with pd.ExcelWriter(f'data/config/report_file.{format}', engine='openpyxl', mode='w') as writer:
+                df = pd.DataFrame({"ID": userList[0], "Имя пользователя": userList[1], "Дата создания": userList[2]})
+                df.to_excel(writer, sheet_name='Users', index=False)
+                df1 = pd.DataFrame({"ID": postsList[0], "Создатель": postsList[1], "Название поста": postsList[2], "Описание поста": postsList[3], "Рейтинг": postsList[4]})
+                df1.to_excel(writer, sheet_name='Posts', index=False)
+                df2 = pd.DataFrame({"ID": commentsList[0], "Пост": commentsList[1], "Пользователь": commentsList[2], "Комментарий": commentsList[3]})
+                df2.to_excel(writer, sheet_name='Comments', index=False)
+
+        db.close()
+        return True
+    except Exception as e:
+        logging.error(f"Ошибка при отправке файла: {e}")
+        return False
