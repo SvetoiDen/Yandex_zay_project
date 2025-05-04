@@ -185,6 +185,8 @@ async def create_report_format(format: str):
         users = db.query(User).all()
         comments = db.query(Comment).all()
 
+        if not posts or not users or not comments:
+            return (False, "1")
         if format == 'csv':
             import csv
             with open(f'data/config/report_file.{format}', 'w') as F:
@@ -193,17 +195,17 @@ async def create_report_format(format: str):
                 writerData.writerow(['ID', "Name", "DataStart"])
                 for row in users:
                     writerData.writerow([row.id, row.name, row.dataStart.strftime("%d-%m-%Y %H:%M:%S")])
-                writerData.writerow([''])
+                writerData.writerow(['\n'])
                 writerData.writerow(['Posts'])
                 writerData.writerow(['ID', "Name", "DataStart"])
                 for row in posts:
                     writerData.writerow([row.id, db.query(User).filter(User.id == row.userId).first().name, row.namePost, row.descPost, row.rating])
-                writerData.writerow([''])
+                writerData.writerow(['\n'])
                 writerData.writerow(['Comments'])
                 writerData.writerow(['ID', "Post", "User", "Comment"])
                 for row in comments:
                     writerData.writerow([row.id,
-                                         db.query(Posts).filter(Posts.id == row.post_id).first().name,
+                                         db.query(Posts).filter(Posts.id == row.post_id).first().namePost,
                                          db.query(User).filter(User.id == row.user_id).first().name,
                                          row.text])
         else:
@@ -222,7 +224,7 @@ async def create_report_format(format: str):
             )
             commentsList = (
                 [id.id for id in comments],
-                [db.query(Posts).filter(Posts.id == row.post_id).first().name for row in comments],
+                [db.query(Posts).filter(Posts.id == row.post_id).first().namePost for row in comments],
                 [db.query(User).filter(User.id == row.user_id).first().name for row in comments],
                 [text.text for text in comments]
             )
@@ -236,7 +238,7 @@ async def create_report_format(format: str):
                 df2.to_excel(writer, sheet_name='Comments', index=False)
 
         db.close()
-        return True
+        return (True, "0")
     except Exception as e:
-        logging.error(f"Ошибка при отправке файла: {e}")
-        return False
+        logging.error(f"Ошибка при отправке файла: {traceback.format_exc()}")
+        return (False, "2")

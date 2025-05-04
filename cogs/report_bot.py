@@ -38,9 +38,11 @@ async def report_format(callback: CallbackQuery):
     dataFormat = callback.data.split('_')[0]
 
     fileTg = await create_report_format(dataFormat)
-    if fileTg:
+    if fileTg[0] and fileTg[1] == "0":
         await callback.message.answer_document(document=FSInputFile(f'data/config/report_file.{dataFormat}'),
                                                caption=f'Вот отчет в формате {dataFormat}')
         os.remove(f'data/config/report_file.{dataFormat}')
-    else:
+    elif fileTg[1] == "2":
         await callback.message.answer(text='⚠️ Ошибка при отправке файла')
+    elif fileTg[1] == "1":
+        await callback.message.answer(text='⚠️ Нету записей для отчета')
