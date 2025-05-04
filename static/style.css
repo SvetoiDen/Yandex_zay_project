@@ -179,7 +179,7 @@ input {
 	width: 100%;
 	background: transparent;
 	box-sizing: border-box;
-	color: var(--tg-theme-button-color);
+	color: var(--tg-theme-text-color);
 }
 
 .textArea::placeholder {

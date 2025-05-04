@@ -25,7 +25,8 @@ async def open_post_callback(callback: CallbackQuery):
 
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(
-                    text="💬 Комментарии", callback_data=f"comments_{post.id}")],
+                    text="💬 Комментарии", callback_data=f"comments_{post.id}"),
+                InlineKeyboardButton(text='⭐ Поставить лайк', callback_data=f'like_{post.id}')],
                 [InlineKeyboardButton(
                     text="🔙 Назад", callback_data="menu")]
             ])
