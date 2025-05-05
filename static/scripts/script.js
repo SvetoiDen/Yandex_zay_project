@@ -55,7 +55,20 @@ async function createFinalPost() {
 	let listContent = document.getElementById('content__structure').children
 	let id = stringGen(6)
 
+	if (name == "") {
+		alert('Вы не ввели имя поста')
+		return
+	} else if (desc == "") {
+		alert('Вы не ввели описание поста')
+		return
+	} else if (listContent.length == 0) {
+		alert("Вы не добавили контента в посте")
+		return
+	}
+
 	console.log(listContent);
+	const loader = document.getElementById('loader-overlay');
+	loader.style.display = "block"
 	
 	let contentList = [];
 	let i = 0;
