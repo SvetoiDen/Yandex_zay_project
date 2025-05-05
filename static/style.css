@@ -136,8 +136,7 @@ h1,h2,h3 {
 .grey_line {
 	display: block;
 	border: 1px solid grey;
-	margin-left: 15px;
-	margin-right: 15px;
+	margin: 15px;
 }
 
 .post__create {
