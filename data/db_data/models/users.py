@@ -11,3 +11,4 @@ class User(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     dataStart = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
     news = orm.relationship("Posts", back_populates='user')
+    profile = sqlalchemy.Column(sqlalchemy.String, nullable=True)
