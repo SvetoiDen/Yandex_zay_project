@@ -15,3 +15,4 @@ class Posts(SqlAlchemyBase):
     user = orm.relationship('User')
     comments = orm.relationship(
         "Comment", back_populates="post", cascade="all, delete-orphan")
+    image = orm.relationship('ImagePosts')
